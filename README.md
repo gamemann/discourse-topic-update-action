@@ -1,4 +1,4 @@
-This repository stores a small GitHub workflow that updates a topic/post on a [Discourse](https://www.discourse.org/) forum using its API with the contents from the [README.md](./README.md) file.
+This repository stores a small GitHub [workflow](./.github/workflows/discourse_topic_update.yml) that updates a topic/post on a [Discourse](https://www.discourse.org/) forum using its API with the contents from the [README.md](./README.md) file.
 
 **NOTE** - It's expected that the workflow in this repository will fail since I don't have a topic to update in this repository. Feel free to use the workflow!
 
