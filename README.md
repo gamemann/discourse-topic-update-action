@@ -1,5 +1,7 @@
 This repository stores a small GitHub workflow that updates a topic/post on a [Discourse](https://www.discourse.org/) forum using its API with the contents from the [README.md](./README.md) file.
 
+**NOTE** - It's expected that the workflow in this repository will fail since I don't have a topic to update in this repository. Feel free to use the workflow!
+
 ## Secrets
 In order to use this workflow, your repository must set a few repository secrets. To add secrets, go to the repository's **Settings** page -> **Security and variables** -> **Actions** -> **Repository secrets** -> **New repository secret**.
 
