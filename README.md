@@ -13,7 +13,7 @@ In order to use this workflow, your repository must set a few repository secrets
 | `DISCOURSE_TOPIC_ID` | The Discourse topic ID to update. The workflow updates the first post of the topic. |
 
 ## Motives
-I create a lot of guides on my modding community [forum](https://forum.moddingcommunuity.com) with a GitHub repository in its [organization](https://github.com/modcommunity) since both GitHub and Discourse use the Markdown syntax.
+I create a lot of guides on my modding community [forum](https://forum.moddingcommunity.com) with a GitHub repository in its [organization](https://github.com/modcommunity) since both GitHub and Discourse use the Markdown syntax.
 
 The GitHub workflow allows me to update the guide through GitHub and it'll automatically update the contents of the topic on the modding community forum.
 
