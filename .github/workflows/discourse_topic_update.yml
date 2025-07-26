@@ -1,0 +1,65 @@
+name: Update Discourse Topic
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  update-discourse:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y jq
+
+    - name: Read README.md and escape for JSON
+      run: |
+        content=$(cat README.md | jq -Rs .)
+        echo "README_JSON=$content" >> $GITHUB_ENV
+
+    - name: Get first post ID from topic (and verify it’s the first)
+      id: get_post
+      env:
+        DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_API_KEY }}
+        DISCOURSE_API_USER: ${{ secrets.DISCOURSE_API_USER }}
+        DISCOURSE_TOPIC_ID: ${{ secrets.DISCOURSE_TOPIC_ID }}
+        DISCOURSE_API_URL: ${{ secrets.DISCOURSE_API_URL }}
+      run: |
+        response=$(curl -s "${DISCOURSE_API_URL}/t/${DISCOURSE_TOPIC_ID}/posts.json" \
+          -H "Api-Key: ${DISCOURSE_API_KEY}" \
+          -H "Api-Username: ${DISCOURSE_API_USER}")
+
+        post=$(echo "$response" | jq '.post_stream.posts[0]')
+        post_id=$(echo "$post" | jq '.id')
+        post_number=$(echo "$post" | jq '.post_number')
+
+        echo "First Post ID: $post_id"
+        echo "Post Number: $post_number"
+
+        if [ "$post_number" != "1" ]; then
+          echo "❌ Error: This is not the first post in the topic. Aborting."
+          exit 1
+        fi
+
+        echo "POST_ID=$post_id" >> $GITHUB_ENV
+
+    - name: Update Discourse post
+      env:
+        DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_API_KEY }}
+        DISCOURSE_API_USER: ${{ secrets.DISCOURSE_API_USER }}
+        DISCOURSE_API_URL: ${{ secrets.DISCOURSE_API_URL }}
+        POST_ID: ${{ env.POST_ID }}
+        README_JSON: ${{ env.README_JSON }}
+      run: |
+        echo "✅ Updating post ID: $POST_ID"
+
+        curl -X PUT "${DISCOURSE_API_URL}/posts/${POST_ID}.json" \
+          -H "Content-Type: application/json" \
+          -H "Api-Key: ${DISCOURSE_API_KEY}" \
+          -H "Api-Username: ${DISCOURSE_API_USER}" \
+          -d "{\"post\": {\"raw\": $README_JSON}}"
+
+        echo "✅ Update complete."
