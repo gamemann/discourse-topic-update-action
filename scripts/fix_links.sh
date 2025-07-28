@@ -2,8 +2,9 @@
 
 set -e
 
-ENV_FILE="$1"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+ENV_FILE="$1"
 FILE="$2"
 
 # Check if file exists.
@@ -21,4 +22,4 @@ if [[ -f "$ENV_FILE" ]]; then
 fi
 
 # Run AWK with access to the env vars
-gawk -v ENVIRON=ENVIRON -f ./scripts/fix_links.awk "$FILE"
+gawk -v ENVIRON=ENVIRON -f "$SCRIPT_DIR/fix_links.awk" "$FILE"
