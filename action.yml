@@ -5,15 +5,21 @@ inputs:
   file:
     description: "The file with Markdown to replace the Discourse topic with."
     required: true
+  discourse_api_key:
+    description: 'Discourse API key'
+    required: true
+  discourse_api_user:
+    description: 'Discourse API username'
+    required: true
+  discourse_topic_id:
+    description: 'Discourse topic ID'
+    required: true
+  discourse_api_url:
+    description: 'Discourse API URL'
+    required: true
 
 runs:
   using: "composite"
-
-  env:
-    DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_API_KEY }}
-    DISCOURSE_API_USER: ${{ secrets.DISCOURSE_API_USER }}
-    DISCOURSE_TOPIC_ID: ${{ secrets.DISCOURSE_TOPIC_ID }}
-    DISCOURSE_API_URL: ${{ secrets.DISCOURSE_API_URL }}
 
   steps:
     - name: Checkout repository
@@ -32,9 +38,9 @@ runs:
       id: get_post
 
       run: |
-        response=$(curl -s "${DISCOURSE_API_URL}/t/${DISCOURSE_TOPIC_ID}/posts.json" \
-          -H "Api-Key: ${DISCOURSE_API_KEY}" \
-          -H "Api-Username: ${DISCOURSE_API_USER}")
+        response=$(curl -s "${{ inputs.discourse_api_url }}/t/${{ inputs.discourse_topic_id }}/posts.json" \
+          -H "Api-Key: ${{ inputs.discourse_api_key }}" \
+          -H "Api-Username: ${{ inputs.discourse_api_user }}")
 
         post=$(echo "$response" | jq '.post_stream.posts[0]')
         post_id=$(echo "$post" | jq '.id')
@@ -52,18 +58,15 @@ runs:
 
     - name: Update Discourse post
       env:
-        DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_API_KEY }}
-        DISCOURSE_API_USER: ${{ secrets.DISCOURSE_API_USER }}
-        DISCOURSE_API_URL: ${{ secrets.DISCOURSE_API_URL }}
         POST_ID: ${{ env.POST_ID }}
         README_JSON: ${{ env.README_JSON }}
       run: |
         echo "✅ Updating post ID: $POST_ID"
 
-        curl -X PUT "${DISCOURSE_API_URL}/posts/${POST_ID}.json" \
+        curl -X PUT "${{ inputs.discourse_api_url }}/posts/${POST_ID}.json" \
           -H "Content-Type: application/json" \
-          -H "Api-Key: ${DISCOURSE_API_KEY}" \
-          -H "Api-Username: ${DISCOURSE_API_USER}" \
+          -H "Api-Key: ${{ inputs.discourse_api_key }}" \
+          -H "Api-Username: ${{ inputs.discourse_api_user }}" \
           -d "{\"post\": {\"raw\": $README_JSON}}"
 
         echo "✅ Update complete."
