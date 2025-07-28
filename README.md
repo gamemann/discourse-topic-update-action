@@ -50,7 +50,7 @@ For example:
 * `#something-1` => `LINK_SOMETHING_1`
 * `#something--2` => `LINK_SOMETHING__2`
 
-Here's an example of the `links.env` file that maps the header examples aboved accordingly.
+Here's an example of the `links.env` file that maps the link examples aboved accordingly.
 
 ```
 LINK_SOMETHING_1="p-232-something-1-2"
