@@ -18,6 +18,10 @@ inputs:
     description: 'Discourse API URL'
     required: true
 
+outputs:
+  README_JSON:
+    description: "The transformed README file content as JSON string."
+
 runs:
   using: "composite"
 
@@ -29,8 +33,9 @@ runs:
     - name: Read and transform repository file.
       id: read-and-fix
       run: |
-        ./scripts/fix_links.sh .dtua/links.env ${{ inputs.file }} > tmp.md
-        echo "README_JSON=$(jq -Rs . tmp.md)" >> $GITHUB_ENV
+        ./scripts/fix_links.sh .dtua/links.env "${{ inputs.file }}" > tmp.md
+        readme_json=$(jq -Rs . tmp.md)
+        echo "::set-output name=README_JSON::$readme_json"
       shell: bash
 
     - name: Get first post ID from topic (and verify it's the first)
@@ -67,7 +72,7 @@ runs:
           -H "Content-Type: application/json" \
           -H "Api-Key: ${{ inputs.discourse_api_key }}" \
           -H "Api-Username: ${{ inputs.discourse_api_user }}" \
-          -d "{\"post\": {\"raw\": $README_JSON}}"
+          -d "{\"post\": {\"raw\": ${README_JSON}}}"
 
         echo "✅ Update complete."
       shell: bash
