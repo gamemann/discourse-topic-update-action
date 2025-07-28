@@ -22,17 +22,16 @@ runs:
   using: "composite"
 
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
     - name: Install dependencies
       run: sudo apt-get update && sudo apt-get install -y jq gawk
+      shell: bash
 
     - name: Read and transform repository file.
       id: read-and-fix
       run: |
         ./scripts/fix_links.sh .dtua/links.env ${{ inputs.file }} > tmp.md
         echo "README_JSON=$(jq -Rs . tmp.md)" >> $GITHUB_ENV
+      shell: bash
 
     - name: Get first post ID from topic (and verify it's the first)
       id: get_post
@@ -55,6 +54,7 @@ runs:
         fi
 
         echo "POST_ID=$post_id" >> $GITHUB_ENV
+      shell: bash
 
     - name: Update Discourse post
       env:
@@ -70,3 +70,4 @@ runs:
           -d "{\"post\": {\"raw\": $README_JSON}}"
 
         echo "✅ Update complete."
+      shell: bash
