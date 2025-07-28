@@ -47,14 +47,14 @@ When setting the environmental variable, you'll need to convert all letters to u
 
 For example:
 
-* `#something-1` => `HEADER_SOMETHING_1`
-* `#something--2` => `HEADER_SOMETHING__2`
+* `#something-1` => `LINK_SOMETHING_1`
+* `#something--2` => `LINK_SOMETHING__2`
 
 Here's an example of the `links.env` file that maps the header examples aboved accordingly.
 
 ```
-HEADER_SOMETHING_1="p-232-something-1-2"
-HEADER_SOMETHING__2="p-232-something--2-1"
+LINK_SOMETHING_1="p-232-something-1-2"
+LINK_SOMETHING__2="p-232-something--2-1"
 ```
 
 ## Workflow Example
