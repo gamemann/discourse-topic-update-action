@@ -1,26 +1,23 @@
 name: Update Discourse Topic
-description: "Automatically updates contents of a Discourse topic with the contents of a file in the repository."
+description: "Automatically updates the contents of the first post in a Discourse topic with the contents of a file inside of the repository."
 
 inputs:
   file:
     description: "The file with Markdown to replace the Discourse topic with."
-    required: true
+    required: false
+    default: "README.md"
   discourse_api_key:
-    description: 'Discourse API key'
+    description: 'The Discourse API key.'
     required: true
   discourse_api_user:
-    description: 'Discourse API username'
+    description: 'The Discourse API username.'
     required: true
   discourse_topic_id:
-    description: 'Discourse topic ID'
+    description: 'The Discourse topic ID.'
     required: true
   discourse_api_url:
-    description: 'Discourse API URL'
+    description: 'The Discourse API URL.'
     required: true
-
-outputs:
-  README_JSON:
-    description: "The transformed README file content as JSON string."
 
 runs:
   using: "composite"
