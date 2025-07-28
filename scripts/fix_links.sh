@@ -22,4 +22,4 @@ if [[ -f "$ENV_FILE" ]]; then
 fi
 
 # Run AWK with access to the env vars
-gawk -v ENVIRON=ENVIRON -f "$SCRIPT_DIR/fix_links.awk" "$FILE"
+gawk -v -f "$SCRIPT_DIR/fix_links.awk" "$FILE"
