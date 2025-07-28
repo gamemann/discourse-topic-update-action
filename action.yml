@@ -1,32 +1,36 @@
 name: Update Discourse Topic
+description: "Automatically updates contents of a Discourse topic with the contents of a file in the repository."
 
-on:
-  push:
-    branches: [ main ]
+inputs:
+  file:
+    description: "The file with Markdown to replace the Discourse topic with."
+    required: true
 
-jobs:
-  update-discourse:
-    runs-on: ubuntu-latest
+runs:
+  using: "composite"
 
-    steps:
+  env:
+    DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_API_KEY }}
+    DISCOURSE_API_USER: ${{ secrets.DISCOURSE_API_USER }}
+    DISCOURSE_TOPIC_ID: ${{ secrets.DISCOURSE_TOPIC_ID }}
+    DISCOURSE_API_URL: ${{ secrets.DISCOURSE_API_URL }}
+
+  steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y jq
+      run: sudo apt-get update && sudo apt-get install -y jq gawk
 
-    - name: Read README.md and escape for JSON
+    - name: Read and transform repository file.
+      id: read-and-fix
       run: |
-        content=$(cat README.md | jq -Rs .)
-        echo "README_JSON=$content" >> $GITHUB_ENV
+        ./scripts/fix_links.sh .dtua/links.env ${{ inputs.file }} > tmp.md
+        echo "README_JSON=$(jq -Rs . tmp.md)" >> $GITHUB_ENV
 
-    - name: Get first post ID from topic (and verify it’s the first)
+    - name: Get first post ID from topic (and verify it's the first)
       id: get_post
-      env:
-        DISCOURSE_API_KEY: ${{ secrets.DISCOURSE_API_KEY }}
-        DISCOURSE_API_USER: ${{ secrets.DISCOURSE_API_USER }}
-        DISCOURSE_TOPIC_ID: ${{ secrets.DISCOURSE_TOPIC_ID }}
-        DISCOURSE_API_URL: ${{ secrets.DISCOURSE_API_URL }}
+
       run: |
         response=$(curl -s "${DISCOURSE_API_URL}/t/${DISCOURSE_TOPIC_ID}/posts.json" \
           -H "Api-Key: ${DISCOURSE_API_KEY}" \
