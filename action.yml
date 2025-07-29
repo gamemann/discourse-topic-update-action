@@ -27,10 +27,6 @@ runs:
   using: "composite"
 
   steps:
-    - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y jq gawk
-      shell: bash
-
     - name: Read and transform repository file.
       id: read-and-fix
       run: |

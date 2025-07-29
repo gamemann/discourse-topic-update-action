@@ -1,5 +1,21 @@
 This is a [GitHub Action](https://github.com/features/actions) that updates the contents of the first post of a [Discourse](https://www.discourse.org/) forum topic with the contents of a file in the caller's repository.
 
+## Requirements
+Here are the Linux packages required from the caller to use this GitHub Action.
+
+* [`jq`](https://jqlang.org/)
+* [`gawk`](https://man7.org/linux/man-pages/man1/gawk.1.html)
+* [`curl`](https://curl.se/)
+* [`bash`](https://en.wikipedia.org/wiki/Bash_(Unix_shell))
+
+On Debian and Ubuntu systems, you most likely will only need to install `jq` and `gawk` separately in your caller repository's workflow like the below step.
+
+```yaml
+- name: Install dependencies for Discourse Topic Update Action.
+  run: sudo apt update && sudo apt install -y jq gawk
+  shell: bash
+```
+
 ## Inputs
 Here are a list of inputs you will need to pass to the action from your repository (the caller). The **only** optional input is `file` which defaults to `README.md`.
 
@@ -59,7 +75,7 @@ LINK_SOMETHING__2="p-232-something--2-1"
 ```
 
 ## Workflow Example
-Here's a workflow example on the caller's side.
+Here's a full workflow example on the caller's side.
 
 ```yaml
 name: Update Discourse Topic
@@ -76,12 +92,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Install dependencies for Discourse Topic Update Action.
+      run: sudo apt update && sudo apt install -y jq gawk
+      shell: bash
+
     - uses: gamemann/discourse-topic-update-action@v1.0.0
       with:
         file: CONTENTS.md
         discourse_api_key: ${{ secrets.DISCOURSE_API_KEY }}
         discourse_api_user: ${{ secrets.DISCOURSE_API_USER }}
-        discourse_topic_id: ${{ secrets.DISCOURSE_TOPIC_ID }}
+        discourse_topic_id: 123
         discourse_api_url: ${{ secrets.DISCOURSE_API_URL }}
 ```
 
