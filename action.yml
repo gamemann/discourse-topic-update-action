@@ -18,6 +18,10 @@ inputs:
   discourse_api_url:
     description: 'The Discourse API URL.'
     required: true
+  verbose:
+    description: 'Verbose level (0 = none, 1 = basic, 2 = cURL response + basic).'
+    required: false
+    default: '1'
 
 runs:
   using: "composite"
@@ -38,19 +42,31 @@ runs:
       id: get_post
 
       run: |
+        VERBOSE="${{ inputs.verbose }}"
+
         response=$(curl -s "${{ inputs.discourse_api_url }}/t/${{ inputs.discourse_topic_id }}/posts.json" \
           -H "Api-Key: ${{ inputs.discourse_api_key }}" \
           -H "Api-Username: ${{ inputs.discourse_api_user }}")
+
+        # Print API response if verbose mode is enabled.
+        if [ "$VERBOSE" -ge 2 ]; then
+          echo "Raw /t/${{ inputs.discourse_topic_id }}/posts.json Response:"
+          echo
+          echo "$response"
+        fi
 
         post=$(echo "$response" | jq '.post_stream.posts[0]')
         post_id=$(echo "$post" | jq '.id')
         post_number=$(echo "$post" | jq '.post_number')
 
-        echo "First Post ID: $post_id"
-        echo "Post Number: $post_number"
+        if [ "$VERBOSE" -ge 2 ]; then
+          echo "First Post ID: $post_id"
+          echo "Post Number: $post_number"
+        fi
 
         if [ "$post_number" != "1" ]; then
           echo "❌ Error: This is not the first post in the topic. Aborting."
+
           exit 1
         fi
 
@@ -62,13 +78,26 @@ runs:
         POST_ID: ${{ env.POST_ID }}
         README_JSON: ${{ env.README_JSON }}
       run: |
-        echo "✅ Updating post ID: $POST_ID"
+        VERBOSE="${{ inputs.verbose }}"
 
-        curl -X PUT "${{ inputs.discourse_api_url }}/posts/${POST_ID}.json" \
+        if [ "$VERBOSE" -ge 1 ]; then
+          echo "✅ Updating post ID: $POST_ID"
+        fi
+
+        response=$(curl -s -X PUT "${{ inputs.discourse_api_url }}/posts/${POST_ID}.json" \
           -H "Content-Type: application/json" \
           -H "Api-Key: ${{ inputs.discourse_api_key }}" \
           -H "Api-Username: ${{ inputs.discourse_api_user }}" \
-          -d "{\"post\": {\"raw\": ${README_JSON}}}"
+          -d "{\"post\": {\"raw\": ${README_JSON}}}")
 
-        echo "✅ Update complete."
+        if [ "$VERBOSE" -ge 2 ]; then
+          echo "API response from ${{ inputs.discourse_api_url }}/posts/${POST_ID}.json:"
+          echo
+          echo "$response"
+
+        fi
+
+        if [ "$VERBOSE" -ge 1 ]; then
+          echo "✅ Update complete."
+        fi
       shell: bash
