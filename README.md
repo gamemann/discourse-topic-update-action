@@ -87,11 +87,14 @@ jobs:
 
 Then inside of the repository are repository secrets set using the steps mentioned earlier.
 
-
-## Motives
+## My Motives & Examples
 I create a lot of guides on my modding community [forum](https://forum.moddingcommunity.com) with a GitHub repository in its [organization](https://github.com/modcommunity) since both GitHub and Discourse use the Markdown syntax.
 
 This action allows me to update the guide through GitHub then the workflow automatically updates the contents of the topic on the modding community forum.
+
+Here are some guides from my modding community using this GitHub Action!
+
+* [How To Set Up A Rust Game Server](https://github.com/modcommunity/how-to-set-up-a-rust-game-server)
 
 ## Credits
 * [Christian Deacon](https://github.com/gamemann)
