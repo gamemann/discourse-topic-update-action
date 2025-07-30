@@ -35,7 +35,9 @@ It is **strongly recommended** you use repository secrets to safely pass your Di
 To add secrets, go to your repository's **Settings** page -> **Security and variables** -> **Actions** -> **Repository secrets** -> **New repository secret**.
 
 ## Environment Configuration
-The following general variables are available to set inside of the environmental file if specified through the `env_file` input setting.
+The script that processes and updates the final Markdown contents before updating the Discourse topic loads an environment file if the path to the value of `env_file` exists (default is `.dtua/.env`).
+
+Here is the configuration for that file. The following general variables are available to set inside of the environmental file if specified through the `env_file` input setting.
 
 | Name | Default | Description |
 | ---- | ------- | ----------- |
@@ -60,22 +62,16 @@ In the Discourse forum topic, the header links are formatted like the following 
 * [Something 2](#p-232-something--2-1)
 ```
 
-While I *really wish* Discourse would just use the same header link formatting as GitHub, I've decided to create a script that maps header links from GitHub to Discourse.
+While I *really wish* Discourse would just use the same header link formatting as GitHub, I've decided to add functionality to the script that processes the final Markdown contents and maps header links from GitHub to Discourse.
 
-Firstly, in the caller repository's root directory, the following file holds the header link environmental variables.
-
-```bash
-.dtua/links.env
-```
-
-When setting the environmental variable, you'll need to convert all letters to upper-case and replace `-` with `_`.
+The prefix for each link environmental variable is `LINK_`. When setting the environmental variable, you'll need to convert all letters to upper-case and replace `-` with `_`.
 
 For example:
 
 * `#something-1` => `LINK_SOMETHING_1`
 * `#something--2` => `LINK_SOMETHING__2`
 
-Here's an example of the `links.env` file that maps the link examples aboved accordingly.
+Here's an example of setting environmental variables that maps the two links above.
 
 ```
 LINK_SOMETHING_1="p-232-something-1-2"
