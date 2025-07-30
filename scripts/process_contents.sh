@@ -44,14 +44,14 @@ gawk -f "$SCRIPT_DIR/fix_links.awk" "$FILE" > "$TMP_FILE"
 if [[ -n "$LINES_SKIP" ]]; then
     if [[ "$VERBOSE" -ge 1 ]]; then
         echo "Removing line(s): $LINES_SKIP"
-
-        IFS=',' read -ra LINES <<< "$LINES_SKIP"
-        for line in "${LINES[@]}"; do
-            echo "$line"
-        done | sort -nr | while read -r lineno; do
-            sed -i "${lineno}d" "$TMP_FILE"
-        done
     fi
+
+    IFS=',' read -ra LINES <<< "$LINES_SKIP"
+    for line in "${LINES[@]}"; do
+        echo "$line"
+    done | sort -nr | while read -r lineno; do
+        sed -i "${lineno}d" "$TMP_FILE"
+    done
 fi
 
 cat "$TMP_FILE"
