@@ -21,6 +21,7 @@ Here are a list of inputs you will need to pass to the action from your reposito
 
 | Name | Default | Description |
 | ---- | ------- | ----------- |
+| `env_file` | `.dtua/.env` | The environmental file to load. Look at [Environment Configuration](#environment-configuration) for more details! |
 | `file` | `README.md` | The local Markdown file whose contents will replace the Discourse post. |
 | `discourse_api_url` | *N/A* | The Discourse forum URL (e.g., `https://forum.moddingcommunity.com`). |
 | `discourse_api_key` | *N/A* | The Discourse API key (created through the Discourse forum at **Admin** -> **Advanced** -> **API keys**). |
@@ -33,7 +34,14 @@ It is **strongly recommended** you use repository secrets to safely pass your Di
 
 To add secrets, go to your repository's **Settings** page -> **Security and variables** -> **Actions** -> **Repository secrets** -> **New repository secret**.
 
-## Header Links
+## Environment Configuration
+The following general variables are available to set inside of the environmental file if specified through the `env_file` input setting.
+
+| Name | Default | Description |
+| ---- | ------- | ----------- |
+| `LINES_SKIP` | *N/A* | A list of line numbers to skip in the final Markdown output to the Discourse topic separated by commas (if multiple lines). |
+
+### Header Links
 One problem I found when using this action myself was header links on GitHub aren't the same as header links in Discourse posts.
 
 For example, on a Markdown file through GitHub I use this:
