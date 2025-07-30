@@ -42,10 +42,6 @@ gawk -f "$SCRIPT_DIR/fix_links.awk" "$FILE" > "$TMP_FILE"
 
 # Remove line numbers if LINES_SKIP env variable is set.
 if [[ -n "$LINES_SKIP" ]]; then
-    if [[ "$VERBOSE" -ge 1 ]]; then
-        echo "Removing line(s): $LINES_SKIP"
-    fi
-
     IFS=',' read -ra LINES <<< "$LINES_SKIP"
     for line in "${LINES[@]}"; do
         echo "$line"
