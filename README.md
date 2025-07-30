@@ -118,8 +118,11 @@ I create a lot of guides on my modding community [forum](https://forum.moddingco
 
 This action allows me to update the guide through GitHub then the workflow automatically updates the contents of the topic on the modding community forum.
 
-Here are some guides from my modding community using this GitHub Action!
+Here are some guides from my modding community using this neat GitHub Action!
 
+* [How To Set Up Steam Link On A Raspberry Pi](https://github.com/modcommunity/steam-link-with-raspberry-pi-setup)
+* [How To Make A Left 4 Dead 2 Server With Mods](https://github.com/modcommunity/how-to-make-a-l4d2-server-with-mods)
+* [How To Download & Run SteamCMD](https://github.com/modcommunity/how-to-download-and-run-steamcmd)
 * [How To Set Up A Rust Game Server](https://github.com/modcommunity/how-to-set-up-a-rust-game-server)
 
 ## Credits
