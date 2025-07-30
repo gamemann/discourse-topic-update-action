@@ -17,7 +17,7 @@ On Debian and Ubuntu systems, you most likely will only need to install `jq` and
 ```
 
 ## Inputs
-Here are a list of inputs you will need to pass to the action from your repository (the caller). The **only** optional input is `file` which defaults to `README.md`.
+Here are a list of inputs you will need to pass to the action from your repository (the caller). 
 
 | Name | Default | Description |
 | ---- | ------- | ----------- |
@@ -28,6 +28,8 @@ Here are a list of inputs you will need to pass to the action from your reposito
 | `discourse_api_user` | *N/A* | The Discourse API key's user that is set when creating an API key on the Discourse forum. |
 | `discourse_topic_id` | *N/A* | The Discourse topic ID to update. The workflow updates the first post of the topic. |
 | `verbose` | `1` | What verbose output to print in the workflow (0 = None. 1 = Basic updates which includes post and topic ID. 2 = everything from value 1, but with response output from the Discourse API via cURL) |
+
+**NOTE** - The **only optional** inputs are `env_file`, `file`, and `verbose`.
 
 ### Security Note
 It is **strongly recommended** you use repository secrets to safely pass your Discourse forum's API information to the action.
