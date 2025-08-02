@@ -2,6 +2,10 @@ name: Update Discourse Topic
 description: "Automatically updates the contents of the first post in a Discourse topic with the contents of a file inside of the repository."
 
 inputs:
+  verbose:
+    description: 'Verbose level (0 = none, 1 = basic, 2 = cURL response + basic).'
+    required: false
+    default: "1"
   env_file:
     description: "Location of environment file."
     required: false
@@ -10,6 +14,9 @@ inputs:
     description: "The file with Markdown contents to replace the Discourse topic with."
     required: false
     default: "README.md"
+  discourse_api_url:
+    description: 'The Discourse API URL.'
+    required: true
   discourse_api_key:
     description: 'The Discourse API key.'
     required: true
@@ -19,13 +26,6 @@ inputs:
   discourse_topic_id:
     description: 'The Discourse topic ID.'
     required: true
-  discourse_api_url:
-    description: 'The Discourse API URL.'
-    required: true
-  verbose:
-    description: 'Verbose level (0 = none, 1 = basic, 2 = cURL response + basic).'
-    required: false
-    default: "1"
 
 runs:
   using: "composite"
@@ -35,7 +35,7 @@ runs:
       id: read-and-fix
       run: |
         ${{ github.action_path }}/scripts/process_contents.sh "${{ inputs.env_file }}" "${{ inputs.file }}" "${{ inputs.verbose }}" > tmp.md
-        echo "README_JSON=$(jq -Rs . tmp.md)" >> $GITHUB_ENV
+        echo "FILE_JSON=$(jq -Rs . tmp.md)" >> $GITHUB_ENV
       shell: bash
 
     - name: Get first post ID from topic (and verify it's the first)
@@ -44,28 +44,38 @@ runs:
       run: |
         VERBOSE="${{ inputs.verbose }}"
 
-        response=$(curl -s "${{ inputs.discourse_api_url }}/t/${{ inputs.discourse_topic_id }}/posts.json" \
+        resp_full=$(curl -s -w "%{http_code}" -o resp_body.json "${{ inputs.discourse_api_url }}/t/${{ inputs.discourse_topic_id }}/posts.json" \
           -H "Api-Key: ${{ inputs.discourse_api_key }}" \
           -H "Api-Username: ${{ inputs.discourse_api_user }}")
 
-        # Print API response if verbose mode is enabled.
-        if [ "$VERBOSE" -ge 2 ]; then
-          echo "Raw /t/${{ inputs.discourse_topic_id }}/posts.json Response:"
+        http_status="${resp_full: -3}"
+        resp=$(<resp_body.json)
+
+        if [[ "$VERBOSE" -ge 2 ]]; then
+          echo "Raw '/t/${{ inputs.discourse_topic_id }}/posts.json' Response:"
           echo
-          echo "$response"
+          echo "$resp"
         fi
 
-        post=$(echo "$response" | jq '.post_stream.posts[0]')
+        if [[ "$http_status" -ne 200 ]]; then
+          echo "❌ Error: Failed to retrieve first post ID due to HTTP error."
+          echo
+          echo "HTTP Status Code: $http_status"
+
+          exit 1
+        fi
+
+        post=$(echo "$resp" | jq '.post_stream.posts[0]')
         post_id=$(echo "$post" | jq '.id')
         post_number=$(echo "$post" | jq '.post_number')
 
-        if [ "$VERBOSE" -ge 1 ]; then
+        if [[ "$VERBOSE" -ge 1 ]]; then
           echo "First Post ID: $post_id"
           echo "Post Number: $post_number"
         fi
 
-        if [ "$post_number" != "1" ]; then
-          echo "❌ Error: This is not the first post in the topic. Aborting."
+        if [[ "$post_number" != "1" ]]; then
+          echo "❌ Error: This is not the first post in the topic ($post_number). Aborting."
 
           exit 1
         fi
@@ -76,28 +86,42 @@ runs:
     - name: Update Discourse post
       env:
         POST_ID: ${{ env.POST_ID }}
-        README_JSON: ${{ env.README_JSON }}
+        FILE_JSON: ${{ env.FILE_JSON }}
       run: |
         VERBOSE="${{ inputs.verbose }}"
 
-        if [ "$VERBOSE" -ge 1 ]; then
-          echo "✅ Updating post ID: $POST_ID"
+        if [[ "$VERBOSE" -ge 1 ]]; then
+          echo "Updating post ID: $POST_ID"
         fi
 
-        response=$(curl -s -X PUT "${{ inputs.discourse_api_url }}/posts/${POST_ID}.json" \
+        FLAGS=""
+
+        if [[ "$VERBOSE" -ge 3 ]]; then
+          FLAGS="-v"
+        fi
+
+        resp_full=$(curl -s $FLAGS -w "%{http_code}" -o resp_body.json -X PUT "${{ inputs.discourse_api_url }}/posts/${POST_ID}.json" \
           -H "Content-Type: application/json" \
           -H "Api-Key: ${{ inputs.discourse_api_key }}" \
           -H "Api-Username: ${{ inputs.discourse_api_user }}" \
-          -d "{\"post\": {\"raw\": ${README_JSON}}}")
+          -d "{\"post\": {\"raw\": ${FILE_JSON}}}")
 
-        if [ "$VERBOSE" -ge 2 ]; then
-          echo "API response from ${{ inputs.discourse_api_url }}/posts/${POST_ID}.json:"
+        http_status="${resp_full: -3}"
+        resp=$(<resp_body.json)
+
+        if [[ "$VERBOSE" -ge 2 ]]; then
+          echo "API response from '${{ inputs.discourse_api_url }}/posts/${POST_ID}.json':"
           echo
-          echo "$response"
-
+          echo "$resp"
         fi
 
-        if [ "$VERBOSE" -ge 1 ]; then
+        if [[ "$http_status" -ne 200 ]]; then
+          echo "❌ Error: Failed to update topic due to HTTP error."
+          echo
+          echo "HTTP Status Code: $http_status"
+        fi
+
+        if [[ "$VERBOSE" -ge 1 ]]; then
           echo "✅ Update complete."
         fi
       shell: bash

@@ -21,15 +21,15 @@ Here are a list of inputs you will need to pass to the action from your reposito
 
 | Name | Default | Description |
 | ---- | ------- | ----------- |
+| `verbose` | `1` | What verbose output to print in the workflow (0 = None. 1 = Basic updates which includes post and topic ID. 2 = everything from value 1, but with response output from the Discourse API via cURL. 3 = even more cURL output) |
 | `env_file` | `.dtua/.env` | The environmental file to load. Look at [Environment Configuration](#environment-configuration) for more details! |
 | `file` | `README.md` | The local Markdown file whose contents will replace the Discourse post. |
 | `discourse_api_url` | *N/A* | The Discourse forum URL (e.g., `https://forum.moddingcommunity.com`). |
 | `discourse_api_key` | *N/A* | The Discourse API key (created through the Discourse forum at **Admin** -> **Advanced** -> **API keys**). |
 | `discourse_api_user` | *N/A* | The Discourse API key's user that is set when creating an API key on the Discourse forum. |
 | `discourse_topic_id` | *N/A* | The Discourse topic ID to update. The workflow updates the first post of the topic. |
-| `verbose` | `1` | What verbose output to print in the workflow (0 = None. 1 = Basic updates which includes post and topic ID. 2 = everything from value 1, but with response output from the Discourse API via cURL) |
 
-**NOTE** - The **only optional** inputs are `env_file`, `file`, and `verbose`.
+**NOTE** - The **only optional** inputs are `verbose`, `env_file`, and `file`.
 
 ### Security Note
 It is **strongly recommended** you use repository secrets to safely pass your Discourse forum's API information to the action.
@@ -91,7 +91,7 @@ on:
     branches: [ main ]
 
 jobs:
-  update-discourse:
+  update-discourse-topic:
     runs-on: ubuntu-latest
 
     steps:
@@ -105,10 +105,10 @@ jobs:
     - uses: gamemann/discourse-topic-update-action@v1.0.0
       with:
         file: CONTENTS.md
+        discourse_api_url: ${{ secrets.DISCOURSE_API_URL }}
         discourse_api_key: ${{ secrets.DISCOURSE_API_KEY }}
         discourse_api_user: ${{ secrets.DISCOURSE_API_USER }}
         discourse_topic_id: 123
-        discourse_api_url: ${{ secrets.DISCOURSE_API_URL }}
 ```
 
 Then inside of the repository are repository secrets set using the steps mentioned earlier.
@@ -120,10 +120,10 @@ This action allows me to update the guide through GitHub then the workflow autom
 
 Here are some guides from my modding community using this neat GitHub Action!
 
-* [How To Set Up Steam Link On A Raspberry Pi](https://github.com/modcommunity/steam-link-with-raspberry-pi-setup)
-* [How To Make A Left 4 Dead 2 Server With Mods](https://github.com/modcommunity/how-to-make-a-l4d2-server-with-mods)
-* [How To Download & Run SteamCMD](https://github.com/modcommunity/how-to-download-and-run-steamcmd)
-* [How To Set Up A Rust Game Server](https://github.com/modcommunity/how-to-set-up-a-rust-game-server)
+* [How To Set Up Steam Link On A Raspberry Pi](https://github.com/modcommunity/steam-link-with-raspberry-pi-setup/tree/26e602970ed7af1ed42e92f4532effb87ba8c9eb)
+* [How To Make A Left 4 Dead 2 Server With Mods](https://github.com/modcommunity/how-to-make-a-l4d2-server-with-mods/tree/6cb7257ca4ee4a7304c96d5168401f5dcd11f75e)
+* [How To Download & Run SteamCMD](https://github.com/modcommunity/how-to-download-and-run-steamcmd/tree/9e4e72156339480fabbf98a79dd44aea8b0ceb1f)
+* [How To Set Up A Rust Game Server](https://github.com/modcommunity/how-to-set-up-a-rust-game-server/tree/26def7a5d285175ff58eaad89c264f39dd3cd37a)
 
 ## Credits
 * [Christian Deacon](https://github.com/gamemann)
